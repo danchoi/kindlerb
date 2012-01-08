@@ -21,7 +21,7 @@
       <navLabel>
         <text>Table of Contents</text>
       </navLabel>
-      <content src="{{contents_href}}"/>
+      <content src="contents.html"/>
       {{#ncx_sections}}
       <navPoint playOrder="{{playorder}}" class="section" id="{{idref}}">
         <navLabel>

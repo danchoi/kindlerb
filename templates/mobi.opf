@@ -16,8 +16,8 @@
     </x-metadata>
   </metadata>
   <manifest>
-    <item href="{{contents_href}}" media-type="application/xhtml+xml" id="contents"/>
-    <item href="{{nav_contents_href}}" media-type="application/x-dtbncx+xml" id="nav-contents"/>
+    <item href="contents.html" media-type="application/xhtml+xml" id="contents"/>
+    <item href="nav-contents.ncx" media-type="application/x-dtbncx+xml" id="nav-contents"/>
     <item href="cover-image.gif" media-type="image/gif" id="cover-image"/>
     {{#masthead}}
     <item href="{{href}}" media-type="{{media}}" id="masthead"/>

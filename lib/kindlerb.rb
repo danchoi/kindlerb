@@ -25,9 +25,28 @@ The tree structure is
     media/
       001.jpg
       002.jpg
+    masthead.gif
 
 kindlerb will extract article titles from the *.html files and create the NCX
 from that. (DRY)
+
+meta.yml
+    masthead:
+      href: masthead.gif
+      media: image/gif
+
+Need to auto-generate 
+  nav-contents.ncx 
+  contents.html
+
+
+Derive 
+
+    opf_manifest_items
+    opf_spine_items
+    ncx_sections
+
+Pass the whole datastructure to all mustache templates
 
 =end
 
