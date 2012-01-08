@@ -40,10 +40,9 @@ require 'nokogiri'
 target_dir = Pathname.new(ARGV.first || '.')
 
 Dir.chdir target_dir do
-  Dir['sections/*'].entries.sort.map {|section_dir| 
-    puts section_dir
-    section = {
-      :section_meta => YAML::load_file((Pathname.new(section_dir) + '_section.yml')),
+  sections = Dir['sections/*'].entries.sort.map {|section_dir| 
+    {
+      :meta => YAML::load_file((Pathname.new(section_dir) + '_section.yml')),
       :articles => 
         Dir[Pathname.new(section_dir) + '*'].entries.select {|x| x !~ /_section.yml/}.sort.map {|article_file|
           doc = Nokogiri::HTML(File.read(article_file))
@@ -55,7 +54,7 @@ Dir.chdir target_dir do
           }
         }
     }
-    puts section.to_yaml
   }
+  puts sections.to_yaml
 
 end

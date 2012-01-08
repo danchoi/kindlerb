@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
+<ncx xmlns:mbp="http://mobipocket.com/ns/mbp" xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en-US">
+  <head>
+    <meta content="{{doc_uuid}}" name="dtb:uid"/>
+    <meta content="2" name="dtb:depth"/>
+    <meta content="0" name="dtb:totalPageCount"/>
+    <meta content="0" name="dtb:maxPageNumber"/>
+  </head>
+  <docTitle>
+    <text>{{title}}</text>
+  </docTitle>
+  <docAuthor>
+    <text>{{author}}</text>
+  </docAuthor>
+  <navMap>
+    <navPoint playOrder="0" class="periodical" id="periodical">
+      {{#masthead}}
+      <mbp:meta-img src="{{href}}" name="mastheadImage"/>
+      {{/masthead}}
+      <navLabel>
+        <text>Table of Contents</text>
+      </navLabel>
+      <content src="{{contents_href}}"/>
+      {{#ncx_sections}}
+      <navPoint playOrder="{{playorder}}" class="section" id="{{idref}}">
+        <navLabel>
+          <text>{{title}}</text>
+        </navLabel>
+        <content src="{{source}}"/>
+        {{#articles}}
+        <navPoint playOrder="{{playorder}}" class="article" id="{{idref}}">
+          <navLabel>
+            <text>{{title}}</text>
+          </navLabel>
+          <content src="{{source}}"/>
+          <mbp:meta name="description">{{description}}</mbp:meta>
+          <mbp:meta name="author">{{author}}</mbp:meta>
+        </navPoint>
+        {{/articles}}
+      </navPoint>
+      {{/ncx_sections}}
+    </navPoint>
+  </navMap>
+</ncx>
