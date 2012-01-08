@@ -9,19 +9,26 @@ files.
 
 Make sure kindlegen is on the PATH.
 
+Run the program at the root of the file tree:
+
+    kindlerb
+
+The output will be a mobi document.
+
 The tree structure is 
 
-  opf.yml
-  sections/
-    000/
-      section.yml # contains section title
-      001.html # an article
-  media/
-    001.jpg
-    002.jpg
+    opf.yml
+    sections/
+      000/
+        section.yml # contains section title
+        001.html # an article
+    media/
+      001.jpg
+      002.jpg
 
 kindlerb will extract article titles from the *.html files and create the NCX
 from that. (DRY)
+
 
 
 =end
