@@ -55,8 +55,11 @@ Pass the whole datastructure to all mustache templates
 require 'pathname'
 require 'yaml'
 require 'nokogiri'
+require 'mustache'
 
 target_dir = Pathname.new(ARGV.first || '.')
+
+opf_template = File.read(File.join(File.dirname(__FILE__) + "/../templates/opf.mustache"))
 
 Dir.chdir target_dir do
   sections = Dir['sections/*'].entries.sort.map {|section_dir| 
@@ -75,5 +78,24 @@ Dir.chdir target_dir do
     }
   }
   puts sections.to_yaml
+  puts '-' * 80
+
+  # opf file
+  document = YAML::load_file("_document.yml")  
+  document[:manifest_items] = sections.map {|section| 
+    section[:articles].map {|article|
+      {
+        :href => article[:file],
+        :media => "MEDIA",
+        :idref => article[:file].gsub(/\D/,'')
+      }
+    }
+  }.flatten
+  # add manifest
+
+  # spine
+  puts document.inspect
+  opf = Mustache.render opf_template, document
+  puts opf
 
 end
