@@ -107,6 +107,7 @@ Dir.chdir target_dir do
 
   document = YAML::load_file("_document.yml")  
   document[:masthead] ||= "masthead.gif"
+  document[:first_article] = sections[0][:articles][0]
   document[:sections] = sections
   document[:manifest_items] = sections.map {|section| 
     section[:articles].map {|article|
