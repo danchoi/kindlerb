@@ -30,10 +30,12 @@ The tree structure is
 kindlerb will extract article titles from the *.html files and create the NCX
 from that. (DRY)
 
-meta.yml
+_document.yml
+
     masthead:
       href: masthead.gif
       media: image/gif
+    etc.
 
 Need to auto-generate 
   nav-contents.ncx 
@@ -59,8 +61,8 @@ require 'mustache'
 
 target_dir = Pathname.new(ARGV.first || '.')
 
-opf_template = File.read(File.join(File.dirname(__FILE__) + "/../templates/opf.mustache"))
-ncx_template = File.read(File.join(File.dirname(__FILE__) + "/../templates/ncx.mustache"))
+opf_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/opf.mustache"))
+ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.mustache"))
 
 Dir.chdir target_dir do
   playorder = 0
@@ -76,6 +78,7 @@ Dir.chdir target_dir do
             doc = Nokogiri::HTML(File.read(article_file))
             {
               :file => article_file,
+              :href => article_file,
               :title => doc.search("html/head/title").map(&:inner_text).first,
               :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
               :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
