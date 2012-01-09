@@ -60,20 +60,28 @@ require 'mustache'
 target_dir = Pathname.new(ARGV.first || '.')
 
 opf_template = File.read(File.join(File.dirname(__FILE__) + "/../templates/opf.mustache"))
+ncx_template = File.read(File.join(File.dirname(__FILE__) + "/../templates/ncx.mustache"))
 
 Dir.chdir target_dir do
-  sections = Dir['sections/*'].entries.sort.map {|section_dir| 
+  playorder = 0
+  sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
     {
       :meta => YAML::load_file((Pathname.new(section_dir) + '_section.yml')),
+      :play_order => (playorder += 1),
+      :idref => section_dir.gsub(/\D/, ''),
       :articles => 
-        Dir[Pathname.new(section_dir) + '*'].entries.select {|x| x !~ /_section.yml/}.sort.map {|article_file|
-          doc = Nokogiri::HTML(File.read(article_file))
-          {
-            :file => article_file,
-            :title => doc.search("html/head/title").map(&:inner_text).first,
-            :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
-            :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first
-          }
+        Dir[Pathname.new(section_dir) + '*'].entries.
+          select {|x| x !~ /_section.yml/}.sort.
+          map.with_index {|article_file|
+            doc = Nokogiri::HTML(File.read(article_file))
+            {
+              :file => article_file,
+              :title => doc.search("html/head/title").map(&:inner_text).first,
+              :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
+              :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
+              :playorder => (playorder += 1),
+              :idref => article_file.gsub(/\D/, '')
+            }
         }
     }
   }
@@ -82,12 +90,13 @@ Dir.chdir target_dir do
 
   # opf file
   document = YAML::load_file("_document.yml")  
+  document[:sections] = sections
   document[:manifest_items] = sections.map {|section| 
     section[:articles].map {|article|
       {
         :href => article[:file],
         :media => "application/xhtml+xml",
-        :idref => article[:file].gsub(/\D/,'')
+        :idref => article[:idref]
       }
     }
   }.flatten
@@ -99,10 +108,15 @@ Dir.chdir target_dir do
       }
     }
   }.flatten
-
- 
   puts document.inspect
+
   opf = Mustache.render opf_template, document
   puts opf
+  puts '-' * 80
+
+  # NCX
+  ncx = Mustache.render ncx_template, document
+  puts ncx
+
 
 end

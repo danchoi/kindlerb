@@ -22,7 +22,7 @@
         <text>Table of Contents</text>
       </navLabel>
       <content src="contents.html"/>
-      {{#ncx_sections}}
+      {{#sections}}
       <navPoint playOrder="{{playorder}}" class="section" id="{{idref}}">
         <navLabel>
           <text>{{title}}</text>
@@ -33,13 +33,13 @@
           <navLabel>
             <text>{{title}}</text>
           </navLabel>
-          <content src="{{source}}"/>
+          <content src="{{href}}"/>
           <mbp:meta name="description">{{description}}</mbp:meta>
           <mbp:meta name="author">{{author}}</mbp:meta>
         </navPoint>
         {{/articles}}
       </navPoint>
-      {{/ncx_sections}}
+      {{/sections}}
     </navPoint>
   </navMap>
 </ncx>
