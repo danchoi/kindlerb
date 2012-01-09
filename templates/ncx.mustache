@@ -14,23 +14,17 @@
     <text>{{author}}</text>
   </docAuthor>
   <navMap>
-    <navPoint playOrder="0" class="periodical" id="periodical">
+    <navPoint playOrder="1" class="periodical" id="periodical">
       <mbp:meta-img src="{{masthead}}" name="mastheadImage"/>
-      <navLabel>
-        <text>Table of Contents</text>
-      </navLabel>
+      <navLabel><text>Table of Contents</text></navLabel>
       <content src="contents.html"/>
       {{#sections}}
       <navPoint playOrder="{{playorder}}" class="section" id="{{idref}}">
-        <navLabel>
-          <text>{{title}}</text>
-        </navLabel>
+        <navLabel><text>{{title}}</text></navLabel>
         <content src="{{href}}"/>
         {{#articles}}
         <navPoint playOrder="{{playorder}}" class="article" id="{{idref}}">
-          <navLabel>
-            <text>{{short_title}}</text>
-          </navLabel>
+          <navLabel><text>{{short_title}}</text></navLabel>
           <content src="{{href}}"/>
           <mbp:meta name="description">{{description}}</mbp:meta>
           <mbp:meta name="author">{{author}}</mbp:meta>
