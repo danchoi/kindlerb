@@ -71,6 +71,16 @@ cover_gif = File.join(File.dirname(__FILE__), '..', "templates/cover-image.gif")
 `cp #{masthead_gif} #{target_dir}/masthead.gif` 
 `cp #{cover_gif} #{target_dir}/cover-image.gif` 
 
+class String
+  def shorten(max)
+    if length > max
+      Array(self[0,max].split(/\s+/)[0..-2]).join(' ') + '...'
+    else
+      self
+    end
+  end
+end
+
 Dir.chdir target_dir do
   playorder = 0
 
@@ -80,7 +90,7 @@ Dir.chdir target_dir do
     meta = YAML::load_file((Pathname.new(section_dir) + '_section.yml'))
     articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| x !~ /_section.yml/}.sort
     {
-      :title => meta['title'],
+      :title => meta['title'].shorten(40),
       :playorder => (playorder += 1),
       :idref => "section-#{section_dir.gsub(/\D/, '')}",
       :href => articles[0],
@@ -95,7 +105,8 @@ Dir.chdir target_dir do
             {
               :file => article_file,
               :href => article_file,
-              :title => doc.search("html/head/title").map(&:inner_text).first,
+              :title => (title = doc.search("html/head/title").map(&:inner_text).first),
+              :short_title => title.shorten(40),
               :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
               :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
               :playorder => (playorder += 1),
