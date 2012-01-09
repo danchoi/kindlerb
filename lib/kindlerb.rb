@@ -66,6 +66,9 @@ ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.
 
 Dir.chdir target_dir do
   playorder = 0
+
+  images = []
+
   sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
     {
       :meta => YAML::load_file((Pathname.new(section_dir) + '_section.yml')),
@@ -76,6 +79,12 @@ Dir.chdir target_dir do
           select {|x| x !~ /_section.yml/}.sort.
           map.with_index {|article_file|
             doc = Nokogiri::HTML(File.read(article_file))
+            article_images = doc.search("img").map {|img| 
+              mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
+              {:href => img[:src], :mimetype => mimetype}
+            }
+            images.push *article_images
+
             {
               :file => article_file,
               :href => article_file,
@@ -88,7 +97,9 @@ Dir.chdir target_dir do
         }
     }
   }
+
   puts sections.to_yaml
+  puts images.inspect
   puts '-' * 80
 
   # opf file
@@ -102,7 +113,13 @@ Dir.chdir target_dir do
         :idref => article[:idref]
       }
     }
-  }.flatten
+  }.flatten + images.map.with_index {|img, idx| 
+    {
+      :href => img[:href],
+      :media => img[:mimetype],
+      :idref => "img-%03d" % idx
+    }
+  }
   
   document[:spine_items] = sections.map {|section| 
     section[:articles].map {|article|
