@@ -35,8 +35,7 @@ epubsecrets.com nesting your toc in the ncx file and the nookkindle workaround
 
 google search: nested ncx kinde
 
-Important hint: Order of spina.
-
+Important: Order of spine.
 
   We figured out that we get this error when we have a mismatch between the toc.ncx hierarchy and the <spine> list in content.opf.
 
