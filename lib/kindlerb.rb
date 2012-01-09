@@ -68,7 +68,7 @@ Dir.chdir target_dir do
     {
       :meta => YAML::load_file((Pathname.new(section_dir) + '_section.yml')),
       :play_order => (playorder += 1),
-      :idref => section_dir.gsub(/\D/, ''),
+      :idref => "section-#{section_dir.gsub(/\D/, '')}",
       :articles => 
         Dir[Pathname.new(section_dir) + '*'].entries.
           select {|x| x !~ /_section.yml/}.sort.
@@ -80,7 +80,7 @@ Dir.chdir target_dir do
               :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
               :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
               :playorder => (playorder += 1),
-              :idref => article_file.gsub(/\D/, '')
+              :idref => "item-#{article_file.gsub(/\D/, '')}"
             }
         }
     }
