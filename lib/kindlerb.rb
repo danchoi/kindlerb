@@ -58,6 +58,7 @@ require 'pathname'
 require 'yaml'
 require 'nokogiri'
 require 'mustache'
+require 'fileutils'
 
 target_dir = Pathname.new(ARGV.first || '.')
 
@@ -98,11 +99,6 @@ Dir.chdir target_dir do
     }
   }
 
-  puts sections.to_yaml
-  puts images.inspect
-  puts '-' * 80
-
-  # opf file
   document = YAML::load_file("_document.yml")  
   document[:sections] = sections
   document[:manifest_items] = sections.map {|section| 
@@ -128,15 +124,15 @@ Dir.chdir target_dir do
       }
     }
   }.flatten
-  puts document.inspect
 
   opf = Mustache.render opf_template, document
-  puts opf
-  puts '-' * 80
+  File.open("kindlerb.opf", "w") {|f| f.puts opf}
+  puts "Wrote #{target_dir}/kindlerb.opf"
 
   # NCX
   ncx = Mustache.render ncx_template, document
-  puts ncx
+  File.open("kindlerb.ncx", "w") {|f| f.puts ncx}
+  puts "Wrote #{target_dir}/kindlerb.ncx"
 
 
 end
