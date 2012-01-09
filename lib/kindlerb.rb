@@ -64,6 +64,12 @@ target_dir = Pathname.new(ARGV.first || '.')
 
 opf_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/opf.mustache"))
 ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.mustache"))
+contents_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/contents.mustache"))
+masthead_gif = File.join(File.dirname(__FILE__), '..', "templates/masthead.gif")
+cover_gif = File.join(File.dirname(__FILE__), '..', "templates/cover-image.gif")
+
+`cp #{masthead_gif} #{target_dir}/masthead.gif` 
+`cp #{cover_gif} #{target_dir}/cover-image.gif` 
 
 Dir.chdir target_dir do
   playorder = 0
@@ -71,14 +77,14 @@ Dir.chdir target_dir do
   images = []
 
   sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
+    meta = YAML::load_file((Pathname.new(section_dir) + '_section.yml'))
+    articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| x !~ /_section.yml/}.sort
     {
-      :meta => YAML::load_file((Pathname.new(section_dir) + '_section.yml')),
-      :play_order => (playorder += 1),
+      :title => meta['title'],
+      :playorder => (playorder += 1),
       :idref => "section-#{section_dir.gsub(/\D/, '')}",
-      :articles => 
-        Dir[Pathname.new(section_dir) + '*'].entries.
-          select {|x| x !~ /_section.yml/}.sort.
-          map.with_index {|article_file|
+      :href => articles[0],
+      :articles => articles.map {|article_file|
             doc = Nokogiri::HTML(File.read(article_file))
             article_images = doc.search("img").map {|img| 
               mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
@@ -100,6 +106,7 @@ Dir.chdir target_dir do
   }
 
   document = YAML::load_file("_document.yml")  
+  document[:masthead] ||= "masthead.gif"
   document[:sections] = sections
   document[:manifest_items] = sections.map {|section| 
     section[:articles].map {|article|
@@ -120,7 +127,7 @@ Dir.chdir target_dir do
   document[:spine_items] = sections.map {|section| 
     section[:articles].map {|article|
       {
-        :idref => article[:file].gsub(/\D/,'')
+        :idref => article[:idref]
       }
     }
   }.flatten
@@ -131,8 +138,15 @@ Dir.chdir target_dir do
 
   # NCX
   ncx = Mustache.render ncx_template, document
-  File.open("kindlerb.ncx", "w") {|f| f.puts ncx}
-  puts "Wrote #{target_dir}/kindlerb.ncx"
+  File.open("nav-contents.ncx", "w") {|f| f.puts ncx}
+  puts "Wrote #{target_dir}/nav-contents.ncx"
+
+  # contents
+  contents = Mustache.render contents_template, document
+  File.open("contents.html", "w") {|f| f.puts contents}
+  puts "Wrote #{target_dir}/contents.html"
 
 
+
+  exec "kindlegen -verbose -c2 -o k.mobi kindlerb.opf"
 end

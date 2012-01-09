@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <title>Table of Contents</title>
+  </head>
+  <body>
+    <h1>Contents</h1>
+    {{#sections}}
+    <h4>{{title}}</h4>
+    <ul>
+      {{#articles}}
+      <li>
+        <a href="{{file}}">{{title}}</a>
+      </li>
+      {{/articles}}
+    </ul>
+    {{/sections}}
+  </body>
+</html>

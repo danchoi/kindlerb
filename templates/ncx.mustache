@@ -15,9 +15,7 @@
   </docAuthor>
   <navMap>
     <navPoint playOrder="0" class="periodical" id="periodical">
-      {{#masthead}}
-      <mbp:meta-img src="{{href}}" name="mastheadImage"/>
-      {{/masthead}}
+      <mbp:meta-img src="{{masthead}}" name="mastheadImage"/>
       <navLabel>
         <text>Table of Contents</text>
       </navLabel>
@@ -27,7 +25,7 @@
         <navLabel>
           <text>{{title}}</text>
         </navLabel>
-        <content src="{{source}}"/>
+        <content src="{{href}}"/>
         {{#articles}}
         <navPoint playOrder="{{playorder}}" class="article" id="{{idref}}">
           <navLabel>
