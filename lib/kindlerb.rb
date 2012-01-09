@@ -86,14 +86,21 @@ Dir.chdir target_dir do
     section[:articles].map {|article|
       {
         :href => article[:file],
-        :media => "MEDIA",
+        :media => "application/xhtml+xml",
         :idref => article[:file].gsub(/\D/,'')
       }
     }
   }.flatten
-  # add manifest
+  
+  document[:spine_items] = sections.map {|section| 
+    section[:articles].map {|article|
+      {
+        :idref => article[:file].gsub(/\D/,'')
+      }
+    }
+  }.flatten
 
-  # spine
+ 
   puts document.inspect
   opf = Mustache.render opf_template, document
   puts opf
