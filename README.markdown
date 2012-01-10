@@ -76,5 +76,11 @@ Daniel Choi
 * twitter: danchoi
 
 
+I'm indebted to [mhl][https://github.com/mhl] for writing the
+[guardian-for-kindle][https://github.com/mhl/guardian-for-kindle] MOBI
+generator in Python. `kindlerb` ported a bunch of ideas from that project over
+to Ruby.
+
+
 
 
