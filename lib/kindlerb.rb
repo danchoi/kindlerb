@@ -17,30 +17,25 @@ The output will be a mobi document.
 
 The tree structure is 
 
-    opf.yml
+    _docuemnt.yml
     sections/
       000/
-        section.yml # contains section title
+        _section.txt # contains section title
         001.html # an article
-    media/
+    media/ # optional
       001.jpg
       002.jpg
-    masthead.gif
 
 kindlerb will extract article titles from the *.html files and create the NCX
 from that. (DRY)
 
 _document.yml
 
-    masthead:
-      href: masthead.gif
-      media: image/gif
-    etc.
+    masthead: [path to masthead.gif]
 
 Need to auto-generate 
   nav-contents.ncx 
   contents.html
-
 
 Derive 
 
@@ -48,9 +43,12 @@ Derive
     opf_spine_items
     ncx_sections
 
-Pass the whole datastructure to all mustache templates
 
 =end
+
+unless `which kindlegen` =~ /kindlegen/
+  abort "Please install kindlegen on your path"
+end
 
 # extract nav structure
 
