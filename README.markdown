@@ -48,14 +48,15 @@ the *.html files .
 The _document.yml is a YAML document. It should look like something like this:
 
     --- 
-    doc_uuid: kindlefeeder.21395-2011-12-19
-    title: kindlefeeder
-    author: kindlefeeder
-    publisher: kindlefeeder.com
+    doc_uuid: kindlerb.21395-2011-12-19
+    title: my-ebook
+    author: my-ebook
+    publisher: me
     subject: News
     date: "2011-12-19"
     masthead: /home/choi/Desktop/masthead.gif
     cover: /home/choi/Desktop/cover.gif
+    mobi_outfile: my-ebook.mobi
 
 kindlerb uses the the file tree and _document.yml to construct these additional
 resource required by Amazon's `kindlegen` program:
@@ -64,8 +65,9 @@ resource required by Amazon's `kindlegen` program:
 * contents.html
 * kindlerb.opf
 
-After that, kindlerb will exec the `kindlegen` program to generate your mobi document.
-The document will be named after `title` in your _document.yml.
+After that, kindlerb will exec the kindlegen program to generate your mobi
+document.  The filename the output document is specified by the 'mobi_outfile'
+value in _document.yml.
 
 ## Images
 

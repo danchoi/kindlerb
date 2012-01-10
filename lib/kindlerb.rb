@@ -19,7 +19,7 @@ end
 
 
 module Kindlerb
-  VERSION = '0.0.1'
+  VERSION = '0.0.2'
 
   def self.run
 
@@ -31,9 +31,6 @@ module Kindlerb
     section_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/section.mustache"))
     masthead_gif = File.join(File.dirname(__FILE__), '..', "templates/masthead.gif")
     cover_gif = File.join(File.dirname(__FILE__), '..', "templates/cover-image.gif")
-
-    `cp #{masthead_gif} #{target_dir}/masthead.gif` 
-    `cp #{cover_gif} #{target_dir}/cover-image.gif` 
 
     Dir.chdir target_dir do
       playorder = 1
@@ -108,10 +105,8 @@ module Kindlerb
 
       }
 
-      document['masthead'] ||= "masthead.gif"
-      document['cover'] ||= "cover.gif"
       document[:first_article] = sections[0][:articles][0]
-      document[:sections] = sections
+      document['sections'] = sections
 
 
       document[:manifest_items] = manifest_items + images.map.with_index {|img, idx| 
@@ -136,8 +131,8 @@ module Kindlerb
       File.open("contents.html", "w") {|f| f.puts contents}
       puts "Wrote #{target_dir}/contents.html"
 
-      outfile = "%s.mobi" % document['title'].gsub(/\W/, '_')
-
+      outfile = document['mobi_outfile']
+      puts "Writing #{outfile}"
       exec "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
     end
   end
