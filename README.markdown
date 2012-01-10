@@ -11,6 +11,10 @@ files.
 
 Make sure `kindlegen` is on the PATH.
 
+## Install
+
+    gem install kindlerb
+
 ## How to use it 
 
 Run the program at the root of the file tree:
