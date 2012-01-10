@@ -81,8 +81,10 @@ paths are relative, they should be relative to the target file tree root.
 Daniel Choi 
 
 * email: dhchoi@gmail.com
-* github: danchoi
-* twitter: danchoi
+* github: [danchoi][github]
+* twitter: @danchoi
+
+[github]:http://github.com/danchoi
 
 
 I'm indebted to [mhl][mhl] for writing the
