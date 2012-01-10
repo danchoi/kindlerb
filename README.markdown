@@ -9,7 +9,12 @@ files.
 
 ## Requirements
 
-Make sure `kindlegen` is on the PATH.
+* Ruby 1.9.x. 
+* Make sure kindlegen is on your PATH.
+
+You can get kindlegen [here][kindlegen].
+
+[kindlegen]:http://www.amazon.com/gp/feature.html?docId=1000234621
 
 ## Install
 
