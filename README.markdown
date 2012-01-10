@@ -2,13 +2,69 @@
 
 kindlerb is a Ruby Kindle periodical-format ebook generator.
 
+kindlerb converts a file tree of sections, articles, images, and metadata into
+a MOBI periodical-formatted document for the Kindle. It is a wrapper around the
+`kindlegen` program from Amazon that hides the details for templating OPF and NCX
+files.
+
 ## Requirements
 
-Amazon's `kindlegen` program must be on your `PATH`.
+Make sure `kindlegen` is on the PATH.
 
-## Forthcoming
+## How to use it 
 
-More documentation forthcoming
+Run the program at the root of the file tree:
+
+    kindlerb [filetree dir]
+
+The output will be a mobi document.
+
+The file tree input structure is 
+
+    _document.yml
+    sections/
+      000/
+        _section.txt # contains section title
+        000.html # an article
+        001.html 
+      001/
+        _section.txt 
+        000.html
+        001.html 
+        003.html
+
+kindlerb will extract article titles from the <head><title> tag in the *.html files .
+
+The _document.yml is a YAML document. It should look like something like this:
+
+    --- 
+    doc_uuid: kindlefeeder.21395-2011-12-19
+    title: kindlefeeder
+    author: kindlefeeder
+    publisher: kindlefeeder.com
+    subject: News
+    date: "2011-12-19"
+    masthead: /home/choi/Desktop/masthead.gif
+    cover: /home/choi/Desktop/cover.gif
+
+kindlerb uses the the file tree and _document.yml to construct these additional
+resource required by Amazon's `kindlegen` program:
+
+* nav-contents.ncx 
+* contents.html
+* kindlerb.opf
+
+After that, kindlerb will exec the `kindlegen` program to generate your mobi document.
+The document will be named after `title` in your _document.yml.
+
+
+## Author 
+
+Daniel Choi 
+
+* email: dhchoi@gmail.com
+* github: danchoi
+* twitter: danchoi
 
 
 
