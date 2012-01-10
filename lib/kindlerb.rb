@@ -138,7 +138,7 @@ module Kindlerb
 
       outfile = "%s.mobi" % document['title'].gsub(/\W/, '_')
 
-      exec "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}. Done.'"
+      exec "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
     end
   end
 end
