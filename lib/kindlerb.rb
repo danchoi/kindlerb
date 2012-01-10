@@ -94,7 +94,7 @@ Dir.chdir target_dir do
   section_html_files = []
 
   sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
-    meta = YAML::load_file((Pathname.new(section_dir) + '_section.yml'))
+    section_title = File.read((Pathname.new(section_dir) + '_section.txt')).strip
     articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| File.basename(x) !~ /section/}.sort
     section_html_files << (section_html_file = (Pathname.new(section_dir) + 'section.html').to_s)
     idref = "item-#{section_dir.gsub(/\D/, '')}"
@@ -108,7 +108,7 @@ Dir.chdir target_dir do
 
     s = {
       :path => section_dir,
-      :title => meta['title'].shorten(40),
+      :title => section_title.shorten(40),
       :playorder => (playorder += 1),
       :idref => idref,
       :href => Pathname.new(section_dir) + 'section.html',
