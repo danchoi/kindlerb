@@ -108,8 +108,8 @@ module Kindlerb
 
       }
 
-      document[:masthead] ||= "masthead.gif"
-      document[:cover] ||= "cover.gif"
+      document['masthead'] ||= "masthead.gif"
+      document['cover'] ||= "cover.gif"
       document[:first_article] = sections[0][:articles][0]
       document[:sections] = sections
 

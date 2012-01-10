@@ -33,7 +33,8 @@ The file tree input structure is
         001.html 
         003.html
 
-kindlerb will extract article titles from the <head><title> tag in the *.html files .
+kindlerb will extract article titles from the `<title>` (in `<head>`) tag in
+the *.html files .
 
 The _document.yml is a YAML document. It should look like something like this:
 
@@ -56,6 +57,14 @@ resource required by Amazon's `kindlegen` program:
 
 After that, kindlerb will exec the `kindlegen` program to generate your mobi document.
 The document will be named after `title` in your _document.yml.
+
+## Images
+
+kindlerb will incorporate images into the generated ebook by parsing all the
+`src` attributes of all the `<img>` tags in your *.html files.
+
+The `src` attributes must point to image files on the local filesystem. If the
+paths are relative, they should be relative to the target file tree root. 
 
 
 ## Author 
