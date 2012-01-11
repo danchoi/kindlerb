@@ -19,7 +19,7 @@ end
 
 
 module Kindlerb
-  VERSION = '0.0.2'
+  VERSION = '0.0.3'
 
   def self.run
 
@@ -83,7 +83,7 @@ module Kindlerb
                   :file => article_file,
                   :href => article_file,
                   :title => title, 
-                  :short_title => title.shorten(40),
+                  :short_title => title.shorten(60),
                   :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
                   :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
                   :playorder => (playorder += 1),
