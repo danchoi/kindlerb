@@ -40,7 +40,7 @@ The file tree input structure is
         _section.txt 
         000.html
         001.html 
-        003.html
+        002.html
 
 kindlerb will extract article titles from the `<title>` (in `<head>`) tag in
 the *.html files .
@@ -76,6 +76,11 @@ kindlerb will incorporate images into the generated ebook by parsing all the
 
 The `src` attributes must point to image files on the local filesystem. If the
 paths are relative, they should be relative to the target file tree root. 
+
+
+## Encoding
+
+Make sure all your textual source files are encoded in UTF-8.
 
 
 ## Author 
