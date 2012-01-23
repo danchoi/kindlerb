@@ -1,6 +1,11 @@
 # kindlerb
 
-kindlerb is a Ruby Kindle periodical-format ebook generator.
+kindlerb is a Ruby Kindle periodical-format ebook generator. I extracted
+this tool from [kindlefeeder.com][kf1]. I also built [Kindlefodder][kf2] on
+top of kindlerb.
+
+[kf1]:http://kindlefeeder.com
+[kf2]:https://github.com/danchoi/kindlefodder
 
 kindlerb converts a file tree of sections, articles, images, and metadata into
 a MOBI periodical-formatted document for the Kindle. It is a wrapper around the
