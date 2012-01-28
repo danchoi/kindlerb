@@ -21,7 +21,7 @@ end
 
 
 module Kindlerb
-  VERSION = '0.0.3'
+  VERSION = '0.0.4'
 
   def self.run
 
