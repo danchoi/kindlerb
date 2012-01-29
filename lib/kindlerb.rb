@@ -21,7 +21,7 @@ end
 
 
 module Kindlerb
-  VERSION = '0.0.5'
+  VERSION = '0.0.6'
 
   def self.run
 
@@ -53,7 +53,9 @@ module Kindlerb
       section_html_files = []
 
       sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
-        section_title = File.read((Pathname.new(section_dir) + '_section.txt'), 'r:UTF-8').strip
+        c = File.read(Pathname.new(section_dir) + '_section.txt')
+        c.force_encoding("UTF-8")
+        section_title = c.strip
         articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| File.basename(x) !~ /section/}.sort
         section_html_files << (section_html_file = (Pathname.new(section_dir) + 'section.html').to_s)
         idref = "item-#{section_dir.gsub(/\D/, '')}"
