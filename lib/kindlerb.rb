@@ -21,7 +21,7 @@ end
 
 
 module Kindlerb
-  VERSION = '0.0.7'
+  VERSION = '0.0.8'
 
   def self.run
 
@@ -137,7 +137,9 @@ module Kindlerb
 
       outfile = document['mobi_outfile']
       puts "Writing #{outfile}"
-      exec "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+      cmd = "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+      puts cmd
+      exec cmd
     end
   end
 end
