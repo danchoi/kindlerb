@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 unless `which kindlegen` =~ /kindlegen/
   abort "Please install kindlegen on your path"
 end
@@ -19,7 +21,7 @@ end
 
 
 module Kindlerb
-  VERSION = '0.0.3'
+  VERSION = '0.0.8'
 
   def self.run
 
@@ -51,7 +53,9 @@ module Kindlerb
       section_html_files = []
 
       sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
-        section_title = File.read((Pathname.new(section_dir) + '_section.txt')).strip
+        c = File.read(Pathname.new(section_dir) + '_section.txt')
+        c.force_encoding("UTF-8")
+        section_title = c.strip
         articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| File.basename(x) !~ /section/}.sort
         section_html_files << (section_html_file = (Pathname.new(section_dir) + 'section.html').to_s)
         idref = "item-#{section_dir.gsub(/\D/, '')}"
@@ -84,7 +88,7 @@ module Kindlerb
                   :href => article_file,
                   :title => title, 
                   :short_title => title.shorten(60),
-                  :author => doc.search("html/head/meta[@name=author]").map{|n|n[:name]}.first,
+                  :author => doc.search("html/head/meta[@name=author]").map{|n|n[:content]}.first,
                   :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
                   :playorder => (playorder += 1),
                   :idref => idref
@@ -134,7 +138,9 @@ module Kindlerb
 
       outfile = document['mobi_outfile']
       puts "Writing #{outfile}"
-      exec "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+      cmd = "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+      puts cmd
+      exec cmd
     end
   end
 end
