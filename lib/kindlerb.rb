@@ -116,6 +116,7 @@ module Kindlerb
           :idref => "img-%03d" % idx
         }
       } 
+      document[:cover_mimetype] ||= "image/gif"
      
       opf = Mustache.render opf_template, document
       File.open("kindlerb.opf", "w") {|f| f.puts opf}
