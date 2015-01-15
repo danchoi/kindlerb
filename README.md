@@ -29,6 +29,9 @@ OR run:
 
     gem install kindlerb
 
+After install **cd** into your app root and then run the below command - this will install the required Kindlegen package:
+`setupkindlerb`
+
 ## How to use it 
 
 Require kindlerb in your project.
