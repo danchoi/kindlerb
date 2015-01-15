@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.name        = "kindlerb"
   s.version     = '0.1.1'
   s.platform    = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 1.9.0'
+  s.required_ruby_version = '>= 2.0.0'
 
   s.authors     = ["Daniel Choi", "Emir Aydin"]
   s.email       = ["dhchoi@gmail.com", "emir@emiraydin.com"]
