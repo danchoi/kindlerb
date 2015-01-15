@@ -25,6 +25,7 @@ module Kindlerb
 
     # Define Kindlegen download files for different OS's
     executable = 'kindlegen'
+    windows = false
     compressed_file = case RbConfig::CONFIG['host_os']
     when /mac|darwin/i
       extract = 'unzip '
@@ -33,6 +34,7 @@ module Kindlerb
       extract = 'tar zxf '
       "kindlegen_linux_2.6_i386_v2_9.tar.gz"
     when /mingw32/i
+      windows = true
       extract = 'unzip '
       executable = 'kindlegen.exe'
       "kindlegen_win32_v2_9.zip"
@@ -44,15 +46,18 @@ module Kindlerb
     url = 'http://kindlegen.s3.amazonaws.com/' + compressed_file
 
     # Download and extract the Kindlegen file into gem's /etc folder
-    unless File.directory?(File.dirname(ext_dir))
-      FileUtils.mkdir_p(File.dirname(ext_dir))
+    unless File.directory?(ext_dir)
+      FileUtils.mkdir_p(ext_dir)
     end
     system 'curl ' + url + ' -o ' + ext_dir + compressed_file
     FileUtils.cd(ext_dir)
     system extract + compressed_file
 
     # Move the executable into gem's /bin folder
-    moved = FileUtils.mv(ext_dir + '/' + executable, bin_dir)
+    unless File.directory?(bin_dir)
+      FileUtils.mkdir_p(bin_dir)
+    end
+    moved = FileUtils.mv(ext_dir + executable, bin_dir)
 
     # Clean up ext folder
     if moved
@@ -60,7 +65,13 @@ module Kindlerb
     end
 
     # Give exec permissions to Kindlegen file
-    FileUtils.chmod 0754, bin_dir + '/' + executable
+    exec_file = bin_dir + executable
+    if windows
+      cmd = "icacls #{exec_file} /T /C /grant Everyone:(f)"
+      system cmd
+    else
+      FileUtils.chmod 0754, exec_file
+    end
 
   end
 
