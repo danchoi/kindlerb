@@ -1,9 +1,5 @@
 # encoding: utf-8
 
-unless `which kindlegen` =~ /kindlegen/
-  abort "Please install kindlegen on your path"
-end
-
 # extract nav structure
 
 require 'pathname'
