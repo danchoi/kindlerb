@@ -108,7 +108,7 @@ paths are relative, they should be relative to the target file tree root.
 Make sure all your textual source files are encoded in UTF-8.
 
 
-## Author 
+## Authors
 
 **Daniel Choi**
 * email: dhchoi@gmail.com
