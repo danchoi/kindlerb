@@ -23,17 +23,31 @@ You can get kindlegen [here][kindlegen].
 
 ## Install
 
+Add `gem 'kindlerb'` to your Gemfile then run `bundle install`
+    
+OR run:
+
     gem install kindlerb
 
 ## How to use it 
 
-Run the program at the root of the file tree:
+Require kindlerb in your project.
 
-    kindlerb [filetree dir]
+    require 'kindlerb'
+
+### Kindlerb.run(target_dir, verbose, compression_method)
+
+Only the first argument is mandatory, everything else will use default values if no arguments are provided.
+
+**target_dir** = Put the directory that contains your ebook files
+
+**verbose** = true or false. Default is false.
+
+**compression_method** = 'c0' (no compression) OR 'c1' (standard DOC compression) OR 'c2' (Kindle huffdic compression). Default is 'c2'.
 
 The output will be a mobi document.
 
-The file tree input structure is 
+**target_dir** should include the below files and structure: 
 
     _document.yml
     sections/
@@ -74,6 +88,12 @@ After that, kindlerb will exec the kindlegen program to generate your mobi
 document.  The filename the output document is specified by the 'mobi_outfile'
 value in _document.yml.
 
+### Kindlerb.executable
+Will return the full path to the Kindlegen executable file.
+
+### Kindlerb.download
+This is automatically called when you first install the gem. It downloads the appropriate Kindlegen version for the host OS.
+
 ## Images
 
 kindlerb will incorporate images into the generated ebook by parsing all the
@@ -90,22 +110,22 @@ Make sure all your textual source files are encoded in UTF-8.
 
 ## Author 
 
-Daniel Choi 
-
+**Daniel Choi**
 * email: dhchoi@gmail.com
 * github: [danchoi][github]
 * twitter: @danchoi
-
 [github]:http://github.com/danchoi
 
+**Emir Aydin**
+* email: emir@emiraydin.com
+* github: [emiraydin][github]
+* twitter: @emiraydin
+[github]:http://github.com/emiraydin
 
-I'm indebted to [mhl][mhl] for writing the
+
+Indebted to [mhl][mhl] for writing the
 [guardian-for-kindle][guardian-for-kindle] MOBI generator in Python. kindlerb
 ported a bunch of ideas from that project over to Ruby.
 
 [mhl]:https://github.com/mhl
 [guardian-for-kindle]:https://github.com/mhl/guardian-for-kindle
-
-
-
-
