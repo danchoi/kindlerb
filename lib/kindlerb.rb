@@ -214,7 +214,17 @@ module Kindlerb
       puts "Writing #{outfile}"
       cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
       puts cmd
-      exec cmd
+      system cmd
+
+      # If the system call returns anything other than nil, the call was successful
+      # Because Kindlegen completes build successfully with warnings
+      successful = $?.exitstatus.nil? ? false : true
+      if successful
+        return true
+      else
+        return false
+      end
+
     end
   end
 end
