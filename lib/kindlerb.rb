@@ -24,14 +24,13 @@ module Kindlerb
     bin_dir = gem_path + '/bin/'
 
     # Define Kindlegen download files for different OS's
+    executable = 'kindlegen'
     compressed_file = case RbConfig::CONFIG['host_os']
     when /mac|darwin/i
       extract = 'unzip '
-      executable = 'kindlegen'
       "KindleGen_Mac_i386_v2_9.zip"
     when /linux|cygwin/i
       extract = 'tar zxf '
-      executable = 'kindlegen'
       "kindlegen_linux_2.6_i386_v2_9.tar.gz"
     when /mingw32/i
       extract = 'unzip '
