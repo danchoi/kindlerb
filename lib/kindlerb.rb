@@ -19,8 +19,52 @@ class String
   end
 end
 
-
 module Kindlerb
+
+  def self.download
+
+    gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
+    ext_dir = gem_path + '/ext/'
+    bin_dir = gem_path + '/bin/'
+
+    # Define Kindlegen download files for different OS's
+    compressed_file = case RbConfig::CONFIG['host_os']
+    when /mac|darwin/i
+      extract = 'unzip '
+      executable = 'kindlegen'
+      "KindleGen_Mac_i386_v2_9.zip"
+    when /linux|cygwin/i
+      extract = 'tar zxf '
+      executable = 'kindlegen'
+      "kindlegen_linux_2.6_i386_v2_9.tar.gz"
+    when /mingw32/i
+      extract = 'unzip '
+      executable = 'kindlegen.exe'
+      "kindlegen_win32_v2_9.zip"
+    else
+      STDERR.puts "Host OS is not supported!"
+      exit(1)
+    end
+
+    url = 'http://kindlegen.s3.amazonaws.com/' + compressed_file
+
+    # Download and extract the Kindlegen file into gem's /etc folder
+    unless File.directory?(File.dirname(ext_dir))
+      FileUtils.mkdir_p(dirname)
+    end
+    system 'curl ' + url + ' -o ' + ext_dir + compressed_file
+    FileUtils.cd(ext_dir)
+    system extract + compressed_file
+
+    # Move the executable into gem's /bin folder and cleanup /ext folder
+    moved = FileUtils.mv(ext_dir + '/' + executable, bin_dir)
+
+    # Clean up ext folder
+    if moved
+      FileUtils.rm_rf(ext_dir)
+    end
+
+  end
 
   def self.run
 
