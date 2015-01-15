@@ -2,3 +2,5 @@
 require 'kindlerb'
 
 Kindlerb.download
+
+puts "Kindlerb is successfully set up!"

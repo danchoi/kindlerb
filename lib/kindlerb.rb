@@ -50,6 +50,7 @@ module Kindlerb
       FileUtils.mkdir_p(ext_dir)
     end
     system 'curl ' + url + ' -o ' + ext_dir + compressed_file
+    puts "Kindlegen downloaded: " + ext_dir + compressed_file
     FileUtils.cd(ext_dir)
     system extract + compressed_file
 
@@ -58,7 +59,7 @@ module Kindlerb
       FileUtils.mkdir_p(bin_dir)
     end
     moved = FileUtils.mv(ext_dir + executable, bin_dir)
-
+    puts "Kindlegen extracted to: " + bin_dir
     # Clean up ext folder
     if moved
       FileUtils.rm_rf(ext_dir)
@@ -72,6 +73,7 @@ module Kindlerb
     else
       FileUtils.chmod 0754, exec_file
     end
+    puts "Execution permissions granted to the user for Kindlegen executable"
 
   end
 
