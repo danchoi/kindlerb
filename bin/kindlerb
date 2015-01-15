@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-require 'rubygems'
-
-if ARGV.first == '-v'
-  puts "kindlerb #{Gem.loaded_specs["kindlerb"].version}"
-  exit
-end
-Kindlerb.run
-
