@@ -46,13 +46,13 @@ module Kindlerb
 
     # Download and extract the Kindlegen file into gem's /etc folder
     unless File.directory?(File.dirname(ext_dir))
-      FileUtils.mkdir_p(dirname)
+      FileUtils.mkdir_p(File.dirname(ext_dir))
     end
     system 'curl ' + url + ' -o ' + ext_dir + compressed_file
     FileUtils.cd(ext_dir)
     system extract + compressed_file
 
-    # Move the executable into gem's /bin folder and cleanup /ext folder
+    # Move the executable into gem's /bin folder
     moved = FileUtils.mv(ext_dir + '/' + executable, bin_dir)
 
     # Clean up ext folder
@@ -60,11 +60,36 @@ module Kindlerb
       FileUtils.rm_rf(ext_dir)
     end
 
+    # Give exec permissions to Kindlegen file
+    FileUtils.chmod 0754, bin_dir + '/' + executable
+
   end
 
-  def self.run
+  # Returns the full path to executable Kindlegen file
+  def self.executable
 
-    target_dir = Pathname.new(ARGV.first || '.')
+    gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
+
+    # Different extensions based on OS
+    kindlegen = case RbConfig::CONFIG['host_os']
+    when /mac|darwin/i
+      "kindlegen"
+    when /linux|cygwin/i
+      "kindlegen"
+    when /mingw32/i
+      "kindlegen.exe"
+    else
+      STDERR.puts "Kindlegen is not installed because host OS is not supported!"
+      exit(1)
+    end
+    
+    exec_path = gem_path + '/bin/' + kindlegen
+
+    return exec_path
+
+  end
+
+  def self.run(target_dir, verbose = false, compression_method = 'c2')
 
     opf_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/opf.mustache"))
     ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.mustache"))
@@ -177,7 +202,7 @@ module Kindlerb
 
       outfile = document['mobi_outfile']
       puts "Writing #{outfile}"
-      cmd = "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+      cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
       puts cmd
       exec cmd
     end
