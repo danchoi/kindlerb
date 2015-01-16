@@ -1,7 +1,7 @@
 # kindlerb
 
-kindlerb is a Ruby Kindle periodical-format ebook generator. I extracted
-this tool from [kindlefeeder.com][kf1]. I also built [Kindlefodder][kf2] on
+kindlerb is a Ruby Kindle periodical-format ebook generator. This tool was initially extracted from
+[kindlefeeder.com][kf1]. [Kindlefodder][kf2] was also built on
 top of kindlerb.
 
 [kf1]:http://kindlefeeder.com
