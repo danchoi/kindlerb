@@ -94,7 +94,7 @@ value in _document.yml.
 Will return the full path to the Kindlegen executable file.
 
 ### Kindlerb.download
-This is automatically called when you first install the gem. It downloads the appropriate Kindlegen version for the host OS.
+This is called when you first install the gem and call `setupkindlerb` executable. It downloads the appropriate Kindlegen version for the host OS. There should be no need to call this after initial set up.
 
 ## Images
 
