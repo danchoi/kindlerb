@@ -16,17 +16,20 @@ files.
 
 * Ruby 1.9.x. 
 
-## Install
+## Installation and Setup
 
-Add `gem 'kindlerb'` to your Gemfile then run `bundle install`
+Add `gem 'kindlerb'` to your Gemfile then run `bundle install --binstubs`
+Then **cd** into your app root and then run the below command - this will install the required Kindlegen package:
+`./bin/setupkindlerb`
     
-OR run:
+OR
 
-    gem install kindlerb
+run `gem install kindlerb`
 
-## Initialize
-After install **cd** into your app root and then run the below command - this will install the required Kindlegen package:
+Then **cd** into your app root and then run the below command - this will install the required Kindlegen package:
 `setupkindlerb`
+
+You're good to go!
 
 ## How to use it 
 
