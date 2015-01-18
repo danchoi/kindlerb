@@ -150,7 +150,7 @@ module Kindlerb
           :idref => idref,
           :href => Pathname.new(section_dir) + 'section.html',
           :articles => articles.map {|article_file|
-                doc = Nokogiri::HTML(File.read(article_file))
+                doc = Nokogiri::HTML(File.read(article_file, :encoding => 'UTF-8'))
                 article_images = doc.search("img").map {|img| 
                   mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
                   {:href => img[:src], :mimetype => mimetype}
