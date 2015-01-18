@@ -18,7 +18,11 @@ files.
 
 ## Installation and Setup
 
-Add `gem 'kindlerb'` to your Gemfile then run `bundle install --binstubs`
+Add `gem 'kindlerb'` to your Gemfile then run
+```
+bundle install
+bundle binstubs kindlerb
+```
 Then **cd** into your app root and then run the below command - this will install the required Kindlegen package:
 `./bin/setupkindlerb`
     
