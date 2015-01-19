@@ -1,7 +1,7 @@
 # kindlerb
 
-kindlerb is a Ruby Kindle periodical-format ebook generator. I extracted
-this tool from [kindlefeeder.com][kf1]. I also built [Kindlefodder][kf2] on
+kindlerb is a Ruby Kindle periodical-format ebook generator. This tool was initially extracted from
+[kindlefeeder.com][kf1]. [Kindlefodder][kf2] was also built on
 top of kindlerb.
 
 [kf1]:http://kindlefeeder.com
@@ -15,25 +15,47 @@ files.
 ## Requirements
 
 * Ruby 1.9.x. 
-* Make sure kindlegen is on your PATH.
 
-You can get kindlegen [here][kindlegen].
+## Installation and Setup
 
-[kindlegen]:http://www.amazon.com/gp/feature.html?docId=1000234621
+Add `gem 'kindlerb'` to your Gemfile then run
+```
+bundle install
+bundle binstubs kindlerb
+```
+Then **cd** into your app root and then run the below command - this will install the required Kindlegen package:
+`./bin/setupkindlerb`
 
-## Install
+You're good to go!
+    
+**OR**
 
-    gem install kindlerb
+run `gem install kindlerb`
+
+Then **cd** into your app root and then run the below command - this will install the required Kindlegen package:
+`setupkindlerb`
+
+You're good to go!
 
 ## How to use it 
 
-Run the program at the root of the file tree:
+Require kindlerb in your project.
 
-    kindlerb [filetree dir]
+    require 'kindlerb'
+
+### Kindlerb.run(target_dir, verbose, compression_method)
+
+Only the first argument is mandatory, everything else will use default values if no arguments are provided.
+
+**target_dir** = Put the directory that contains your ebook files
+
+**verbose** = true or false. Default is false.
+
+**compression_method** = 'c0' (no compression) OR 'c1' (standard DOC compression) OR 'c2' (Kindle huffdic compression). Default is 'c2'.
 
 The output will be a mobi document.
 
-The file tree input structure is 
+**target_dir** should include the below files and structure: 
 
     _document.yml
     sections/
@@ -74,6 +96,12 @@ After that, kindlerb will exec the kindlegen program to generate your mobi
 document.  The filename the output document is specified by the 'mobi_outfile'
 value in _document.yml.
 
+### Kindlerb.executable
+Will return the full path to the Kindlegen executable file.
+
+### Kindlerb.download
+This is called when you first install the gem and call `setupkindlerb` executable. It downloads the appropriate Kindlegen version for the host OS. There should be no need to call this after initial set up.
+
 ## Images
 
 kindlerb will incorporate images into the generated ebook by parsing all the
@@ -88,24 +116,24 @@ paths are relative, they should be relative to the target file tree root.
 Make sure all your textual source files are encoded in UTF-8.
 
 
-## Author 
+## Authors
 
-Daniel Choi 
-
+**Daniel Choi**
 * email: dhchoi@gmail.com
 * github: [danchoi][github]
 * twitter: @danchoi
-
 [github]:http://github.com/danchoi
 
+**Emir Aydin**
+* email: emir@emiraydin.com
+* github: [emiraydin][github]
+* twitter: @emiraydin
+[github]:http://github.com/emiraydin
 
-I'm indebted to [mhl][mhl] for writing the
+
+Indebted to [mhl][mhl] for writing the
 [guardian-for-kindle][guardian-for-kindle] MOBI generator in Python. kindlerb
 ported a bunch of ideas from that project over to Ruby.
 
 [mhl]:https://github.com/mhl
 [guardian-for-kindle]:https://github.com/mhl/guardian-for-kindle
-
-
-
-

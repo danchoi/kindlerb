@@ -1,15 +1,14 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "kindlerb"
 
 Gem::Specification.new do |s|
   s.name        = "kindlerb"
-  s.version     = Kindlerb::VERSION
+  s.version     = '1.0.1'
   s.platform    = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 1.9.0'
+  s.required_ruby_version = '>= 2.0.0'
 
-  s.authors     = ["Daniel Choi"]
-  s.email       = ["dhchoi@gmail.com"]
+  s.authors     = ["Daniel Choi", "Emir Aydin"]
+  s.email       = ["dhchoi@gmail.com", "emir@emiraydin.com"]
   s.homepage    = "http://github.com/danchoi/kindlerb"
   s.summary     = %q{Kindle eperiodical generator}
   s.description = %q{Kindle eperiodical generator}

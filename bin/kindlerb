@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-require 'kindlerb'
-
-if ARGV.first == '-v'
-  puts "kindlerb #{Kindlerb::VERSION}"
-  exit
-end
-Kindlerb.run
-

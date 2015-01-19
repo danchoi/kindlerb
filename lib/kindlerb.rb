@@ -1,9 +1,5 @@
 # encoding: utf-8
 
-unless `which kindlegen` =~ /kindlegen/
-  abort "Please install kindlegen on your path"
-end
-
 # extract nav structure
 
 require 'pathname'
@@ -19,13 +15,93 @@ class String
   end
 end
 
-
 module Kindlerb
-  VERSION = '0.1.1'
 
-  def self.run
+  def self.download
 
-    target_dir = Pathname.new(ARGV.first || '.')
+    gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
+    ext_dir = gem_path + '/ext/'
+    bin_dir = gem_path + '/bin/'
+
+    # Define Kindlegen download files for different OS's
+    executable = 'kindlegen'
+    windows = false
+    compressed_file = case RbConfig::CONFIG['host_os']
+    when /mac|darwin/i
+      extract = 'unzip '
+      "KindleGen_Mac_i386_v2_9.zip"
+    when /linux|cygwin/i
+      extract = 'tar zxf '
+      "kindlegen_linux_2.6_i386_v2_9.tar.gz"
+    when /mingw32/i
+      windows = true
+      extract = 'unzip '
+      executable = 'kindlegen.exe'
+      "kindlegen_win32_v2_9.zip"
+    else
+      STDERR.puts "Host OS is not supported!"
+      exit(1)
+    end
+
+    url = 'http://kindlegen.s3.amazonaws.com/' + compressed_file
+
+    # Download and extract the Kindlegen file into gem's /etc folder
+    unless File.directory?(ext_dir)
+      FileUtils.mkdir_p(ext_dir)
+    end
+    system 'curl ' + url + ' -o ' + ext_dir + compressed_file
+    puts "Kindlegen downloaded: " + ext_dir + compressed_file
+    FileUtils.cd(ext_dir)
+    system extract + compressed_file
+
+    # Move the executable into gem's /bin folder
+    unless File.directory?(bin_dir)
+      FileUtils.mkdir_p(bin_dir)
+    end
+    moved = FileUtils.mv(ext_dir + executable, bin_dir)
+    puts "Kindlegen extracted to: " + bin_dir
+    # Clean up ext folder
+    if moved
+      FileUtils.rm_rf(ext_dir)
+    end
+
+    # Give exec permissions to Kindlegen file
+    exec_file = bin_dir + executable
+    if windows
+      cmd = "icacls #{exec_file} /T /C /grant Everyone:(f)"
+      system cmd
+    else
+      FileUtils.chmod 0754, exec_file
+    end
+    puts "Execution permissions granted to the user for Kindlegen executable"
+
+  end
+
+  # Returns the full path to executable Kindlegen file
+  def self.executable
+
+    gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
+
+    # Different extensions based on OS
+    kindlegen = case RbConfig::CONFIG['host_os']
+    when /mac|darwin/i
+      "kindlegen"
+    when /linux|cygwin/i
+      "kindlegen"
+    when /mingw32/i
+      "kindlegen.exe"
+    else
+      STDERR.puts "Kindlegen is not installed because host OS is not supported!"
+      exit(1)
+    end
+    
+    exec_path = gem_path + '/bin/' + kindlegen
+
+    return exec_path
+
+  end
+
+  def self.run(target_dir, verbose = false, compression_method = 'c2')
 
     opf_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/opf.mustache"))
     ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.mustache"))
@@ -74,7 +150,7 @@ module Kindlerb
           :idref => idref,
           :href => Pathname.new(section_dir) + 'section.html',
           :articles => articles.map {|article_file|
-                doc = Nokogiri::HTML(File.read(article_file))
+                doc = Nokogiri::HTML(File.read(article_file, :encoding => 'UTF-8'))
                 article_images = doc.search("img").map {|img| 
                   mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
                   {:href => img[:src], :mimetype => mimetype}
@@ -138,9 +214,19 @@ module Kindlerb
 
       outfile = document['mobi_outfile']
       puts "Writing #{outfile}"
-      cmd = "kindlegen -verbose -c2 -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+      cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
       puts cmd
-      exec cmd
+      system cmd
+
+      # If the system call returns anything other than nil, the call was successful
+      # Because Kindlegen completes build successfully with warnings
+      successful = $?.exitstatus.nil? ? false : true
+      if successful
+        return true
+      else
+        return false
+      end
+
     end
   end
 end
