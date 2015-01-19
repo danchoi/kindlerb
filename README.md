@@ -18,7 +18,7 @@ files.
 
 ## Installation and Setup
 
-Add `gem 'kindlerb'` to your Gemfile then run
+Add `gem 'kindlerb', github: 'danchoi/kindlerb'` to your Gemfile then run
 ```
 bundle install
 bundle binstubs kindlerb
