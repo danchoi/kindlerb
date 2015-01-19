@@ -25,8 +25,10 @@ bundle binstubs kindlerb
 ```
 Then **cd** into your app root and then run the below command - this will install the required Kindlegen package:
 `./bin/setupkindlerb`
+
+You're good to go!
     
-OR
+**OR**
 
 run `gem install kindlerb`
 
