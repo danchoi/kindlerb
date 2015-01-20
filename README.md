@@ -14,7 +14,7 @@ files.
 
 ## Requirements
 
-* Ruby 1.9.x. 
+* Ruby >= 2.0.0
 
 ## Installation and Setup
 
