@@ -7,6 +7,7 @@ require 'yaml'
 require 'nokogiri'
 require 'mustache'
 require 'fileutils'
+require 'kindlerb/version'
 
 # monkeypatch
 class String
@@ -18,13 +19,18 @@ end
 module Kindlerb
 
   def self.download
+    # use system kindlegen if available
+    if system('kindlegen', out: :close)
+      puts "Using system kindlegen"
+      return
+    end
 
     gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
     ext_dir = gem_path + '/ext/'
     bin_dir = gem_path + '/bin/'
 
     # Define Kindlegen download files for different OS's
-    executable = 'kindlegen'
+    executable_filename = 'kindlegen'
     windows = false
     compressed_file = case RbConfig::CONFIG['host_os']
     when /mac|darwin/i
@@ -36,7 +42,7 @@ module Kindlerb
     when /mingw32/i
       windows = true
       extract = 'unzip '
-      executable = 'kindlegen.exe'
+      executable_filename = 'kindlegen.exe'
       "kindlegen_win32_v2_9.zip"
     else
       STDERR.puts "Host OS is not supported!"
@@ -54,11 +60,11 @@ module Kindlerb
     FileUtils.cd(ext_dir)
     system extract + compressed_file
 
-    # Move the executable into gem's /bin folder
+    # Move the executable_filename into gem's /bin folder
     unless File.directory?(bin_dir)
       FileUtils.mkdir_p(bin_dir)
     end
-    moved = FileUtils.mv(ext_dir + executable, bin_dir)
+    moved = FileUtils.mv(ext_dir + executable_filename, bin_dir)
     puts "Kindlegen extracted to: " + bin_dir
     # Clean up ext folder
     if moved
@@ -66,7 +72,7 @@ module Kindlerb
     end
 
     # Give exec permissions to Kindlegen file
-    exec_file = bin_dir + executable
+    exec_file = bin_dir + executable_filename
     if windows
       cmd = "icacls #{exec_file} /T /C /grant Everyone:(f)"
       system cmd
@@ -79,6 +85,8 @@ module Kindlerb
 
   # Returns the full path to executable Kindlegen file
   def self.executable
+    # use system kindlegen if available
+    return 'kindlegen' if system('kindlegen', out: :close)
 
     gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
 
@@ -91,17 +99,33 @@ module Kindlerb
     when /mingw32/i
       "kindlegen.exe"
     else
-      STDERR.puts "Kindlegen is not installed because host OS is not supported!"
-      exit(1)
+      return nil
     end
-    
+
     exec_path = gem_path + '/bin/' + kindlegen
 
     return exec_path
 
   end
 
+  # Used for users to check whether Kindlerb can work
+  def self.kindlegen_available?
+    kindlegen = self.executable
+    case kindlegen
+    when 'kindlegen'
+      true
+    when String
+      File.exist?(kindlegen)
+    else
+      false
+    end
+  end
+
   def self.run(target_dir, verbose = false, compression_method = 'c2')
+    unless self.kindlegen_available?
+      STDERR.puts "Kindlegen is not available, install it with `setupkindlerb`"
+      exit(1)
+    end
 
     opf_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/opf.mustache"))
     ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.mustache"))
@@ -117,18 +141,18 @@ module Kindlerb
       manifest_items = []
 
       unless File.exist?("_document.yml")
-        
+
         puts "Usage: kindlerb [target file directory]"
 
         abort "Missing _document.yml. Your input file tree is not structured correctly. Please read the README."
       end
 
-      document = YAML::load_file("_document.yml")  
+      document = YAML::load_file("_document.yml")
 
       document[:spine_items] = []
       section_html_files = []
 
-      sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
+      sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir|
         c = File.read(Pathname.new(section_dir) + '_section.txt')
         c.force_encoding("UTF-8")
         section_title = c.strip
@@ -151,7 +175,7 @@ module Kindlerb
           :href => Pathname.new(section_dir) + 'section.html',
           :articles => articles.map {|article_file|
                 doc = Nokogiri::HTML(File.read(article_file, :encoding => 'UTF-8'))
-                article_images = doc.search("img").map {|img| 
+                article_images = doc.search("img").map {|img|
                   mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
                   {:href => img[:src], :mimetype => mimetype}
                 }
@@ -162,7 +186,7 @@ module Kindlerb
                 article = {
                   :file => article_file,
                   :href => article_file,
-                  :title => title, 
+                  :title => title,
                   :short_title => title.shorten(60),
                   :author => doc.search("html/head/meta[@name=author]").map{|n|n[:content]}.first,
                   :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
@@ -189,15 +213,15 @@ module Kindlerb
       document['sections'] = sections
 
 
-      document[:manifest_items] = manifest_items + images.map.with_index {|img, idx| 
+      document[:manifest_items] = manifest_items + images.map.with_index {|img, idx|
         {
           :href => img[:href],
           :media => img[:mimetype],
           :idref => "img-%03d" % idx
         }
-      } 
+      }
       document[:cover_mimetype] ||= "image/gif"
-     
+
       opf = Mustache.render opf_template, document
       File.open("kindlerb.opf", "w") {|f| f.puts opf}
       puts "Wrote #{target_dir}/kindlerb.opf"
