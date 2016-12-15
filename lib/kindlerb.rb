@@ -51,7 +51,7 @@ module Kindlerb
     end
     system 'curl ' + url + ' -o ' + ext_dir + compressed_file
     puts "Kindlegen downloaded: " + ext_dir + compressed_file
-    system extract + ext_dir + compressed_file
+    system extract + ext_dir + compressed_file + ' -d ' + ext_dir
 
     # Move the executable into gem's /bin folder
     unless File.directory?(bin_dir)
