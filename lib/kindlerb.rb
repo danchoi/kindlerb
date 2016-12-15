@@ -219,9 +219,10 @@ module Kindlerb
     File.open(contents_path, "w") {|f| f.puts contents}
     puts "Wrote #{target_dir}/contents.html"
 
-    outfile = base_dir.join document['mobi_outfile']
+    outfile = document['mobi_outfile'] 
+    infile = base_dir.join "kindlerb.opf"
     puts "Writing #{outfile}"
-    cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+    cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} #{infile} && echo 'Wrote MOBI to #{outfile}'"
     puts cmd
     system cmd
 
