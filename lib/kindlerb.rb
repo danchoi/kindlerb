@@ -51,8 +51,7 @@ module Kindlerb
     end
     system 'curl ' + url + ' -o ' + ext_dir + compressed_file
     puts "Kindlegen downloaded: " + ext_dir + compressed_file
-    FileUtils.cd(ext_dir)
-    system extract + compressed_file
+    system extract + ext_dir + compressed_file
 
     # Move the executable into gem's /bin folder
     unless File.directory?(bin_dir)
@@ -110,123 +109,130 @@ module Kindlerb
     masthead_gif = File.join(File.dirname(__FILE__), '..', "templates/masthead.gif")
     cover_gif = File.join(File.dirname(__FILE__), '..', "templates/cover-image.gif")
 
-    Dir.chdir target_dir do
-      playorder = 1
 
-      images = []
-      manifest_items = []
+    playorder = 1
 
-      unless File.exist?("_document.yml")
-        
-        puts "Usage: kindlerb [target file directory]"
+    images = []
+    manifest_items = []
 
-        abort "Missing _document.yml. Your input file tree is not structured correctly. Please read the README."
-      end
+    base_dir = Pathname.new target_dir
+    document_yml = base_dir.join "_document.yml"
 
-      document = YAML::load_file("_document.yml")  
+    unless File.exist? document_yml
+      
+      puts "Usage: kindlerb [target file directory]"
 
-      document[:spine_items] = []
-      section_html_files = []
+      abort "Missing _document.yml. Your input file tree is not structured correctly. Please read the README."
+    end
 
-      sections = Dir['sections/*'].entries.sort.map.with_index {|section_dir| 
-        c = File.read(Pathname.new(section_dir) + '_section.txt')
-        c.force_encoding("UTF-8")
-        section_title = c.strip
-        articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| File.basename(x) !~ /section/}.sort
-        section_html_files << (section_html_file = (Pathname.new(section_dir) + 'section.html').to_s)
-        idref = "item-#{section_dir.gsub(/\D/, '')}"
+    document = YAML::load_file document_yml
 
-        document[:spine_items] << {:idref => idref}
-        manifest_items << {
-          :href => section_html_file,
-          :media => "application/xhtml+xml",
-          :idref => idref
-        }
+    document[:spine_items] = []
+    section_html_files = []
 
-        s = {
-          :path => section_dir,
-          :title => section_title.shorten(40),
-          :playorder => (playorder += 1),
-          :idref => idref,
-          :href => Pathname.new(section_dir) + 'section.html',
-          :articles => articles.map {|article_file|
-                doc = Nokogiri::HTML(File.read(article_file, :encoding => 'UTF-8'))
-                article_images = doc.search("img").map {|img| 
-                  mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
-                  {:href => img[:src], :mimetype => mimetype}
-                }
-                images.push *article_images
-                title = doc.search("html/head/title").map(&:inner_text).first || "no title"
-                idref = "item-#{article_file.gsub(/\D/, '')}"
-                document[:spine_items] << {:idref => idref}
-                article = {
-                  :file => article_file,
-                  :href => article_file,
-                  :title => title, 
-                  :short_title => title.shorten(60),
-                  :author => doc.search("html/head/meta[@name=author]").map{|n|n[:content]}.first,
-                  :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
-                  :playorder => (playorder += 1),
-                  :idref => idref
-                }
-                manifest_items << {
-                  :href => article[:file],
-                  :media => "application/xhtml+xml",
-                  :idref => article[:idref]
-                }
-                article
-            }
-        }
+    sections_all = base_dir.join "sections", "*"
 
-        # Generate the section html
-        out = Mustache.render section_template, s
-        File.open(section_html_file, "w") {|f| f.puts out}
-        s
+    sections = Dir[sections_all].entries.sort.map.with_index {|section_dir| 
+      c = File.read(Pathname.new(section_dir) + '_section.txt')
+      c.force_encoding("UTF-8")
+      section_title = c.strip
+      articles = Dir[Pathname.new(section_dir) + '*'].entries.select {|x| File.basename(x) !~ /section/}.sort
+      section_html_files << (section_html_file = (Pathname.new(section_dir) + 'section.html').to_s)
+      idref = "item-#{section_dir.gsub(/\D/, '')}"
 
+      document[:spine_items] << {:idref => idref}
+      manifest_items << {
+        :href => section_html_file,
+        :media => "application/xhtml+xml",
+        :idref => idref
       }
 
-      document[:first_article] = sections[0][:articles][0]
-      document['sections'] = sections
+      s = {
+        :path => section_dir,
+        :title => section_title.shorten(40),
+        :playorder => (playorder += 1),
+        :idref => idref,
+        :href => Pathname.new(section_dir) + 'section.html',
+        :articles => articles.map {|article_file|
+              doc = Nokogiri::HTML(File.read(article_file, :encoding => 'UTF-8'))
+              article_images = doc.search("img").map {|img| 
+                mimetype =  img[:src] ? "image/#{File.extname(img[:src]).sub('.', '')}" : nil
+                {:href => img[:src], :mimetype => mimetype}
+              }
+              images.push *article_images
+              title = doc.search("html/head/title").map(&:inner_text).first || "no title"
+              idref = "item-#{article_file.gsub(/\D/, '')}"
+              document[:spine_items] << {:idref => idref}
+              article = {
+                :file => article_file,
+                :href => article_file,
+                :title => title, 
+                :short_title => title.shorten(60),
+                :author => doc.search("html/head/meta[@name=author]").map{|n|n[:content]}.first,
+                :description => doc.search("html/head/meta[@name=description]").map{|n|n[:content]}.first,
+                :playorder => (playorder += 1),
+                :idref => idref
+              }
+              manifest_items << {
+                :href => article[:file],
+                :media => "application/xhtml+xml",
+                :idref => article[:idref]
+              }
+              article
+          }
+      }
+
+      # Generate the section html
+      out = Mustache.render section_template, s
+      File.open(section_html_file, "w") {|f| f.puts out}
+      s
+
+    }
+
+    document[:first_article] = sections[0][:articles][0]
+    document['sections'] = sections
 
 
-      document[:manifest_items] = manifest_items + images.map.with_index {|img, idx| 
-        {
-          :href => img[:href],
-          :media => img[:mimetype],
-          :idref => "img-%03d" % idx
-        }
-      } 
-      document[:cover_mimetype] ||= "image/gif"
-     
-      opf = Mustache.render opf_template, document
-      File.open("kindlerb.opf", "w") {|f| f.puts opf}
-      puts "Wrote #{target_dir}/kindlerb.opf"
+    document[:manifest_items] = manifest_items + images.map.with_index {|img, idx| 
+      {
+        :href => img[:href],
+        :media => img[:mimetype],
+        :idref => "img-%03d" % idx
+      }
+    } 
+    document[:cover_mimetype] ||= "image/gif"
+   
+    opf = Mustache.render opf_template, document
+    opf_path = base_dir.join "kindlerb.opf"
+    File.open(opf_path, "w") {|f| f.puts opf}
+    puts "Wrote #{target_dir}/kindlerb.opf"
 
-      # NCX
-      ncx = Mustache.render ncx_template, document
-      File.open("nav-contents.ncx", "w") {|f| f.puts ncx}
-      puts "Wrote #{target_dir}/nav-contents.ncx"
+    # NCX
+    ncx = Mustache.render ncx_template, document
+    ncx_path = base_dir.join "nav-contents.ncx"
+    File.open(ncx_path, "w") {|f| f.puts ncx}
+    puts "Wrote #{target_dir}/nav-contents.ncx"
 
-      # contents
-      contents = Mustache.render contents_template, document
-      File.open("contents.html", "w") {|f| f.puts contents}
-      puts "Wrote #{target_dir}/contents.html"
+    # contents
+    contents = Mustache.render contents_template, document
+    contents_path = base_dir.join "contents.html"
+    File.open(contents_path, "w") {|f| f.puts contents}
+    puts "Wrote #{target_dir}/contents.html"
 
-      outfile = document['mobi_outfile']
-      puts "Writing #{outfile}"
-      cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
-      puts cmd
-      system cmd
+    outfile = base_dir.join document['mobi_outfile']
+    puts "Writing #{outfile}"
+    cmd = self.executable + "#{' -verbose' if verbose} -#{compression_method} -o #{outfile} kindlerb.opf && echo 'Wrote MOBI to #{outfile}'"
+    puts cmd
+    system cmd
 
-      # If the system call returns anything other than nil, the call was successful
-      # Because Kindlegen completes build successfully with warnings
-      successful = $?.exitstatus.nil? ? false : true
-      if successful
-        return true
-      else
-        return false
-      end
-
+    # If the system call returns anything other than nil, the call was successful
+    # Because Kindlegen completes build successfully with warnings
+    successful = $?.exitstatus.nil? ? false : true
+    if successful
+      return true
+    else
+      return false
     end
+
   end
 end
