@@ -7,6 +7,7 @@ require 'yaml'
 require 'nokogiri'
 require 'mustache'
 require 'fileutils'
+require 'kindlerb/version'
 
 # monkeypatch
 class String
@@ -18,13 +19,18 @@ end
 module Kindlerb
 
   def self.download
+    # use system kindlegen if available
+    if system('kindlegen', out: :close)
+      puts "Using system kindlegen"
+      return
+    end
 
     gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
     ext_dir = gem_path + '/ext/'
     bin_dir = gem_path + '/bin/'
 
     # Define Kindlegen download files for different OS's
-    executable = 'kindlegen'
+    executable_filename = 'kindlegen'
     windows = false
     compressed_file = case RbConfig::CONFIG['host_os']
     when /mac|darwin/i
@@ -36,7 +42,7 @@ module Kindlerb
     when /mingw32/i
       windows = true
       extract = 'unzip '
-      executable = 'kindlegen.exe'
+      executable_filename = 'kindlegen.exe'
       "kindlegen_win32_v2_9.zip"
     else
       STDERR.puts "Host OS is not supported!"
@@ -53,11 +59,11 @@ module Kindlerb
     puts "Kindlegen downloaded: " + ext_dir + compressed_file
     system extract + ext_dir + compressed_file + ' -d ' + ext_dir
 
-    # Move the executable into gem's /bin folder
+    # Move the executable_filename into gem's /bin folder
     unless File.directory?(bin_dir)
       FileUtils.mkdir_p(bin_dir)
     end
-    moved = FileUtils.mv(ext_dir + executable, bin_dir)
+    moved = FileUtils.mv(ext_dir + executable_filename, bin_dir)
     puts "Kindlegen extracted to: " + bin_dir
     # Clean up ext folder
     if moved
@@ -65,7 +71,7 @@ module Kindlerb
     end
 
     # Give exec permissions to Kindlegen file
-    exec_file = bin_dir + executable
+    exec_file = bin_dir + executable_filename
     if windows
       cmd = "icacls #{exec_file} /T /C /grant Everyone:(f)"
       system cmd
@@ -78,6 +84,8 @@ module Kindlerb
 
   # Returns the full path to executable Kindlegen file
   def self.executable
+    # use system kindlegen if available
+    return 'kindlegen' if system('kindlegen', out: :close)
 
     gem_path = Gem::Specification.find_by_name('kindlerb').gem_dir
 
@@ -90,17 +98,33 @@ module Kindlerb
     when /mingw32/i
       "kindlegen.exe"
     else
-      STDERR.puts "Kindlegen is not installed because host OS is not supported!"
-      exit(1)
+      return nil
     end
-    
+
     exec_path = gem_path + '/bin/' + kindlegen
 
     return exec_path
 
   end
 
+  # Used for users to check whether Kindlerb can work
+  def self.kindlegen_available?
+    kindlegen = self.executable
+    case kindlegen
+    when 'kindlegen'
+      true
+    when String
+      File.exist?(kindlegen)
+    else
+      false
+    end
+  end
+
   def self.run(target_dir, verbose = false, compression_method = 'c2')
+    unless self.kindlegen_available?
+      STDERR.puts "Kindlegen is not available, install it with `setupkindlerb`"
+      exit(1)
+    end
 
     opf_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/opf.mustache"))
     ncx_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/ncx.mustache"))
@@ -108,7 +132,6 @@ module Kindlerb
     section_template = File.read(File.join(File.dirname(__FILE__), '..', "templates/section.mustache"))
     masthead_gif = File.join(File.dirname(__FILE__), '..', "templates/masthead.gif")
     cover_gif = File.join(File.dirname(__FILE__), '..', "templates/cover-image.gif")
-
 
     playorder = 1
 
