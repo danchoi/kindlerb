@@ -39,7 +39,7 @@ module Kindlerb
       "KindleGen_Mac_i386_v2_9.zip"
     when /linux|cygwin/i
       extract = 'tar zxf '
-      extract_suffix = ' '
+      extract_suffix = ' -C '
       "kindlegen_linux_2.6_i386_v2_9.tar.gz"
     when /mingw32/i
       windows = true
