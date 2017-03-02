@@ -35,13 +35,16 @@ module Kindlerb
     compressed_file = case RbConfig::CONFIG['host_os']
     when /mac|darwin/i
       extract = 'unzip '
+      extract_suffix = ' -d '
       "KindleGen_Mac_i386_v2_9.zip"
     when /linux|cygwin/i
       extract = 'tar zxf '
+      extract_suffix = ' -C '
       "kindlegen_linux_2.6_i386_v2_9.tar.gz"
     when /mingw32/i
       windows = true
       extract = 'unzip '
+      extract_suffix = ' -d '
       executable_filename = 'kindlegen.exe'
       "kindlegen_win32_v2_9.zip"
     else
@@ -57,7 +60,7 @@ module Kindlerb
     end
     system 'curl ' + url + ' -o ' + ext_dir + compressed_file
     puts "Kindlegen downloaded: " + ext_dir + compressed_file
-    system extract + ext_dir + compressed_file + ' -d ' + ext_dir
+    system extract + ext_dir + compressed_file + extract_suffix + ext_dir
 
     # Move the executable_filename into gem's /bin folder
     unless File.directory?(bin_dir)
